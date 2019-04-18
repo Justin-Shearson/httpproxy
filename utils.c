@@ -206,10 +206,13 @@ int sendrequest(int sd)
   if (servhost && servport) {
       /* TODO: establish new connection to http server on behalf of the user 
        * use connecttoserver() and write() */
+      connecttoserver(servehost, servport );
+      write(sd, msg, RESPMSGLEN);
 
       free(msgcp);
       free(msg);
       /*TODO: return newly created socket file descriptor */;
+      return(sd);
   }
   return(0);
 }
@@ -225,7 +228,8 @@ char *readresponse(int sd)
     }
     /* TODO: read response message back and store in msg 
      * use read(), could create other local variables if necessary */
-
+    char *newmsg;
+    read(sd, msg, MAXMSGLEN);
     return(msg);
 
 }
