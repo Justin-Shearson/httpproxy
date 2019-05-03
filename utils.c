@@ -222,15 +222,17 @@ int sendrequest(int sd)
 char *readresponse(int sd)
 {
     char *msg;
+    char *tempmsg;
 
     msg = (char *) malloc(RESPMSGLEN);
     if (!msg) {
       fprintf(stderr, "error : unable to malloc\n");
       return(NULL);
     }
+
     /* TODO: read response message back and store in msg 
      * use read(), could create other local variables if necessary */
-
+    read(sd, msg, RESPMSGLEN);
     return(msg);
 
 }
