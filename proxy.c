@@ -22,7 +22,8 @@ main(int argc, char *argv[])
   int    servsock;    /* server socket descriptor */
 
   fd_set livesdset, servsdset;   /* set of live client sockets and set of live http server sockets */
-  /* TODO: define largest file descriptor number used for select */
+  
+  int maxsd = 200; /* TODO: define largest file descriptor number used for select */
   struct pair * table = malloc(sizeof(struct pair)); /* table to keep client<->server pairs */
 
   char *msg;
@@ -42,7 +43,13 @@ main(int argc, char *argv[])
   table->next = NULL;
 
   /* TODO: initialize all the fd_sets and largest fd numbers */
-  
+  FD_ZERO(&livesdset);
+  FD_ZERO(&servsdset);
+  FD_SET(0, &livesdset);
+  FD_SET(0, &servsdset);
+  FD_SET(maxsd, &livesdset);
+  FD_SET(maxsd, &livesdset);
+
   while (1) {
     int frsock;
 

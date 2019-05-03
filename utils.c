@@ -9,7 +9,10 @@
 #include <netdb.h>
 #include <time.h> 
 #include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "utils.h"
+
 
 #define MAXNAMELEN 256
 #define MAXMSGLEN 8000 
@@ -206,9 +209,9 @@ int sendrequest(int sd)
   if (servhost && servport) {
       /* TODO: establish new connection to http server on behalf of the user 
        * use connecttoserver() and write() */
-      newsd = connecttoserver(servhost, servport);
+      newsd = connecttoserver(servhost, (ushort) &servport);
       if(newsd == -1)
-        printf("%s\n", str(errno));
+        printf("%s\n", strerror(errno));
       write(newsd, msgcp, MAXMSGLEN);
 
       free(msgcp);
