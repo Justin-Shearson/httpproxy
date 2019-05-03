@@ -206,10 +206,15 @@ int sendrequest(int sd)
   if (servhost && servport) {
       /* TODO: establish new connection to http server on behalf of the user 
        * use connecttoserver() and write() */
+      newsd = connecttoserver(servhost, servport);
+      if(newsd == -1)
+        printf("%s\n", str(errno));
+      write(newsd, msgcp, MAXMSGLEN);
 
       free(msgcp);
       free(msg);
-      /*TODO: return newly created socket file descriptor */;
+      /*TODO: return newly created socket file descriptor */
+      return(newsd);
   }
   return(0);
 }
