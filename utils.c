@@ -165,6 +165,7 @@ int connecttoserver(char *servhost, ushort servport)
   /* succesful. return socket descriptor */
   printf("admin: connected to server on '%s' at '%hu' thru '%hu'\n",
 	 servhost, servport, clientport);
+  printf("Test for connect to server");
   return(sd);
 }
 /*----------------------------------------------------------------*/
