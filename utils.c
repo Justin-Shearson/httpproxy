@@ -165,7 +165,6 @@ int connecttoserver(char *servhost, ushort servport)
   /* succesful. return socket descriptor */
   printf("admin: connected to server on '%s' at '%hu' thru '%hu'\n",
 	 servhost, servport, clientport);
-  printf("Test for connect to server");
   return(sd);
 }
 /*----------------------------------------------------------------*/
@@ -177,7 +176,7 @@ int sendrequest(int sd)
   char *msg, *url, *servhost, *servport;
   char *msgcp;
   int 	len;
-
+  printf("%d\n", sd);
     msg = (char *) malloc(MAXMSGLEN);
     msgcp = (char *) malloc(MAXMSGLEN);
     if (!msg || !msgcp) {
@@ -186,15 +185,16 @@ int sendrequest(int sd)
       fprintf(stderr, "error : unable to malloc\n");
       return(1);
     }
-
+    printf("%d\n", sd);
     /* read the message text */
     len = read(sd, msg, MAXMSGLEN);
     if (!len) {
       free(msg);
       free(msgcp);
+      printf("%d\n", len);
       return len;
     }
-
+    printf("After read\n");
   memcpy(msgcp, msg, MAXMSGLEN);
 
   /* extract servhost and servport from http request */
@@ -210,13 +210,17 @@ int sendrequest(int sd)
   if (servhost && servport) {
       /* TODO: establish new connection to http server on behalf of the user 
        * use connecttoserver() and write() */
-      newsd = connecttoserver(servhost, (ushort) &servport);
+      printf("%s\n",servport);
+
+      newsd = connecttoserver(servhost, (ushort) atoi(servport));
+      printf("%d\n", newsd);
       if(newsd == -1)
         printf("%s\n", strerror(errno));
       write(newsd, msgcp, MAXMSGLEN);
 
       free(msgcp);
       free(msg);
+      printf("%d\n", newsd);
       /*TODO: return newly created socket file descriptor */
       return(newsd);
   }
