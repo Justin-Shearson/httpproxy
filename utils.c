@@ -165,6 +165,7 @@ int connecttoserver(char *servhost, ushort servport)
   /* succesful. return socket descriptor */
   printf("admin: connected to server on '%s' at '%hu' thru '%hu'\n",
 	 servhost, servport, clientport);
+  printf("Server socket: %d\n", sd);
   return(sd);
 }
 /*----------------------------------------------------------------*/
@@ -176,7 +177,6 @@ int sendrequest(int sd)
   char *msg, *url, *servhost, *servport;
   char *msgcp;
   int 	len;
-  printf("%d\n", sd);
     msg = (char *) malloc(MAXMSGLEN);
     msgcp = (char *) malloc(MAXMSGLEN);
     if (!msg || !msgcp) {
@@ -185,7 +185,6 @@ int sendrequest(int sd)
       fprintf(stderr, "error : unable to malloc\n");
       return(1);
     }
-    printf("%d\n", sd);
     /* read the message text */
     len = read(sd, msg, MAXMSGLEN);
     if (!len) {
@@ -194,7 +193,6 @@ int sendrequest(int sd)
       printf("%d\n", len);
       return len;
     }
-    printf("After read\n");
   memcpy(msgcp, msg, MAXMSGLEN);
 
   /* extract servhost and servport from http request */
@@ -210,8 +208,6 @@ int sendrequest(int sd)
   if (servhost && servport) {
       /* TODO: establish new connection to http server on behalf of the user 
        * use connecttoserver() and write() */
-      printf("%s\n",servport);
-
       newsd = connecttoserver(servhost, (ushort) atoi(servport));
       printf("%d\n", newsd);
       if(newsd == -1)
@@ -220,7 +216,7 @@ int sendrequest(int sd)
 
       free(msgcp);
       free(msg);
-      printf("%d\n", newsd);
+      printf("Newsd:%d\n", newsd);
       /*TODO: return newly created socket file descriptor */
       return(newsd);
   }
@@ -231,13 +227,12 @@ char *readresponse(int sd)
 {
     char *msg;
     char *tempmsg;
-
     msg = (char *) malloc(RESPMSGLEN);
     if (!msg) {
       fprintf(stderr, "error : unable to malloc\n");
       return(NULL);
     }
-
+    printf("Read response; %d\n", sd);
     /* TODO: read response message back and store in msg 
      * use read(), could create other local variables if necessary */
     read(sd, msg, RESPMSGLEN);

@@ -63,12 +63,9 @@ int main(int argc, char *argv[])
      	* use the combined fd_set for select */
 		for(int i = 0; i < maxsd; i++){
 			if(FD_ISSET(i, &livesdset) || (FD_ISSET(i, &servsdset))){
-				printf("%d\n", i);
+				printf("Set Socks: %d\n", i);
 				FD_SET(i, &workingsdset);
 			}
-		}
-		if(FD_ISSET(frsock, &workingsdset)){
-			printf("%d\n", frsock);
 		}
 		error = select(maxcombinedsd, &workingsdset, NULL, NULL, NULL);
 		if(error == -1) {
@@ -81,24 +78,26 @@ int main(int argc, char *argv[])
 			if(FD_ISSET(frsock, &livesdset)) {
 	    		/* forward the request */
 				int newsd = sendrequest(frsock);
-				printf("%d\n", newsd);
+				printf("Returned newsd: %d\n", newsd);
 				if (!newsd) {
 					printf("admin: disconnect from client\n");
 					/*TODO: clear frsock from fd_set(s) */
-					FD_CLR(frsock, &workingsdset);
+					FD_CLR(frsock, &servsdset);
 					FD_CLR(frsock, &livesdset);
 				} else {
 					/* TODO: insert newsd into fd_set(s) */
 					insertpair(table, newsd, frsock);
 					FD_SET(newsd, &workingsdset);
-					FD_SET(newsd, &livesdset);
 				}
 			} 
 			if(FD_ISSET(frsock, &servsdset)) {
 				char *msg;
 				struct pair *entry=NULL;	
 				struct pair *delentry;
+				printf("frsock: %d\n", frsock);
 				msg = readresponse(frsock);
+				printf("Returned message: %s\n", msg);
+
 				if (!msg) {
 					fprintf(stderr, "error: server died\n");
 					exit(1);
