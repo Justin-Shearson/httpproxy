@@ -165,7 +165,6 @@ int connecttoserver(char *servhost, ushort servport)
   /* succesful. return socket descriptor */
   printf("admin: connected to server on '%s' at '%hu' thru '%hu'\n",
 	 servhost, servport, clientport);
-  printf("Server socket: %d\n", sd);
   return(sd);
 }
 /*----------------------------------------------------------------*/
@@ -206,8 +205,7 @@ int sendrequest(int sd)
      servport = "80";
 
   if (servhost && servport) {
-      /* TODO: establish new connection to http server on behalf of the user 
-       * use connecttoserver() and write() */
+      // Connects to the server and returns the socket that the server is connected on
       newsd = connecttoserver(servhost, (ushort) atoi(servport));
       printf("%d\n", newsd);
       if(newsd == -1)
@@ -216,8 +214,7 @@ int sendrequest(int sd)
 
       free(msgcp);
       free(msg);
-      printf("Newsd:%d\n", newsd);
-      /*TODO: return newly created socket file descriptor */
+      // return the new socket
       return(newsd);
   }
   return(0);
@@ -232,11 +229,9 @@ char *readresponse(int sd)
       fprintf(stderr, "error : unable to malloc\n");
       return(NULL);
     }
-    printf("Read response; %d\n", sd);
-    /* TODO: read response message back and store in msg 
-     * use read(), could create other local variables if necessary */
+    // Reads the message in the buffer and outputs it to message  
     read(sd, msg, RESPMSGLEN);
-    return(msg);
+    return(msg); // Message is returned to the server.
 
 }
 

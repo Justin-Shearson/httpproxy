@@ -67,7 +67,6 @@ int main(int argc, char *argv[])
     	*/
 		for(int i = 0; i < maxsd; i++){
 			if(FD_ISSET(i, &livesdset) || (FD_ISSET(i, &servsdset))){
-				printf("Set Socks: %d\n", i);
 				FD_SET(i, &workingsdset);
 			}
 		}
@@ -85,7 +84,6 @@ int main(int argc, char *argv[])
 		*/
 		for (frsock = 0; frsock < maxsd; frsock++) {
 			if (frsock == servsock) continue;
-			
 			/*
 			  If the socket is set, the server has found a client wanting to make a request through the server
 			    The server then parses the message being requested by the client and then forwards that
@@ -94,27 +92,29 @@ int main(int argc, char *argv[])
 			if(FD_ISSET(frsock, &livesdset)) {
 	    		/* forward the request */
 				int newsd = sendrequest(frsock);
-				printf("Returned newsd: %d\n", newsd);
 				if (!newsd) {
 					printf("admin: disconnect from client\n");
 					// Inserts that socket into the server and live sd sets
 					FD_CLR(frsock, &servsdset);
 					FD_CLR(frsock, &livesdset);
 				} else {
-					/* TODO: insert newsd into fd_set(s) */
+					// Inserts the newsd into the working/servsdset
 					insertpair(table, newsd, frsock);
 					FD_SET(newsd, &workingsdset);
 					FD_SET(newsd, &servsdset);
 				}
 			} 
+
+			/*
+			  If the current socket for the server is set, this means that there was a message received from
+			  	the website. The server reads the response message from the webstite and forwards the
+			  	message response to the client
+			*/
 			if(FD_ISSET(frsock, &servsdset)) {
 				char *msg;
 				struct pair *entry=NULL;	
 				struct pair *delentry;
-				printf("frsock: %d\n", frsock);
 				msg = readresponse(frsock);
-				printf("Returned message: %s\n", msg);
-
 				if (!msg) {
 					fprintf(stderr, "error: server died\n");
 					exit(1);
@@ -127,11 +127,11 @@ int main(int argc, char *argv[])
 					exit(1);
 				}
 
+				//forward the response message to the client
 				forwardresponse(entry->clientsd, msg);
 				delentry = deletepair(table, entry->serversd);
 
-				/* TODO: clear the client and server sockets used for 
-				 * this http connection from the fd_set(s) */
+				//Clears the current socket from the live/server sd sets
 				FD_CLR(frsock, &livesdset);
 				FD_CLR(frsock, &servsdset);
 			}
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 			int csd = accept(servsock, (struct sockaddr*)&caddr, &clen);
 
 			if (csd != -1) {
-	    		/* TODO: put csd into fd_set(s) */
+	    		// input csd into the live/server sd sets
 				FD_SET(csd, &livesdset);
 				FD_SET(csd, &servsdset);
 			} else {
